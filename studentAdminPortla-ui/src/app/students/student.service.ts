@@ -1,3 +1,5 @@
+import { UpdateStudentRequest } from './../models/api-models/update-student-request.model';
+// import { Student } from 'src/app/models/ui-models/student.model';
 import { Student } from './../models/api-models/student.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -18,5 +20,22 @@ export class StudentService {
 
   getStudent(studentId: string){
     return this.httpClient.get<Student>(this.baseApiUrl + "/students/" + studentId);
+  }
+
+  updateStudent(studentId: string, studentRequest: Student)
+  {
+      const updateStudent: UpdateStudentRequest =
+      {
+        firstName : studentRequest.firstName,
+        lastName : studentRequest.lastName,
+        dateOjBirth : studentRequest.dateOjBirth,
+        email : studentRequest.email,
+        mobile : studentRequest.mobile,
+        genderId : studentRequest.genderId,
+        postalAddress : studentRequest.address.postalAddress,
+        physicalAddress : studentRequest.address.physicalAddress
+      }
+
+      return this.httpClient.put<Student>(this.baseApiUrl + "/students/" + studentId, updateStudent);
   }
 }

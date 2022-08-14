@@ -1,7 +1,10 @@
+import { GendersService } from './../../services/genders.service';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Student } from 'src/app/models/ui-models/student.model';
 import { StudentService } from '../student.service';
+import { Gender } from 'src/app/models/ui-models/gender.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-view-student',
@@ -31,7 +34,12 @@ export class ViewStudentComponent implements OnInit {
     },
   };
 
-  constructor(private studentService:StudentService, private route: ActivatedRoute) { }
+  genderList: Gender[] = [];
+
+  constructor(private studentService:StudentService,
+              private gendersService: GendersService,
+              private route: ActivatedRoute,
+              private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) =>{   // get parametrs from route
@@ -43,8 +51,30 @@ export class ViewStudentComponent implements OnInit {
         }, (error) =>{
           console.log(error);
         })
+
+        this.gendersService.getGendersList().subscribe((response)=>{
+          console.log(response);
+          this.genderList = response;
+        }, (error) =>{
+          console.log(error);
+        })
       }
     })
+  }
+
+  onUpdate()
+  {
+    this.studentService.updateStudent(this.student.id, this.student).subscribe((response) =>{
+      // show notification
+      this.snackBar.open("The student is updated successfully!", undefined, {
+        duration: 2000
+      });
+      console.log(response);
+    }, (error) =>{
+      this.snackBar.open("Something went wrong!");
+      //Log error
+      console.log(error);
+    });
   }
 
 }
