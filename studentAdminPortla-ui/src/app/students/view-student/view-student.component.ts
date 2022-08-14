@@ -1,6 +1,6 @@
 import { GendersService } from './../../services/genders.service';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterModule, Routes } from '@angular/router';
 import { Student } from 'src/app/models/ui-models/student.model';
 import { StudentService } from '../student.service';
 import { Gender } from 'src/app/models/ui-models/gender.model';
@@ -39,7 +39,8 @@ export class ViewStudentComponent implements OnInit {
   constructor(private studentService:StudentService,
               private gendersService: GendersService,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar) { }
+              private snackBar: MatSnackBar,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) =>{   // get parametrs from route
@@ -71,9 +72,26 @@ export class ViewStudentComponent implements OnInit {
       });
       console.log(response);
     }, (error) =>{
-      this.snackBar.open("Something went wrong!");
+      this.snackBar.open("Something went wrong when updating the student");
       //Log error
       console.log(error);
+    });
+  }
+
+  onDelete()
+  {
+    this.studentService.deleteStudent(this.student.id).subscribe((response) =>{
+      console.log(response);
+      this.snackBar.open("Student(" + this.student.firstName +") was successfully deleted!", undefined, {
+        duration: 2000
+      })
+
+      setTimeout(() => {
+        this.router.navigateByUrl('/students');
+      }, 2000);
+    }, (error) => {
+      console.log(error);
+      this.snackBar.open("Something went wrong when deleting the student");
     });
   }
 
