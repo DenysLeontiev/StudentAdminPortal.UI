@@ -36,6 +36,9 @@ export class ViewStudentComponent implements OnInit {
 
   genderList: Gender[] = [];
 
+  isNewStudent = false;
+  header = '';
+
   constructor(private studentService:StudentService,
               private gendersService: GendersService,
               private route: ActivatedRoute,
@@ -46,12 +49,22 @@ export class ViewStudentComponent implements OnInit {
     this.route.paramMap.subscribe((params) =>{   // get parametrs from route
       this.studentId = params.get('id');
       if(this.studentId){
-        this.studentService.getStudent(this.studentId).subscribe((response) =>{
-          this.student = response
-          console.log(response);
-        }, (error) =>{
-          console.log(error);
-        })
+
+        if(this.studentId.toLowerCase() === 'Add'.toLowerCase()){
+          this.isNewStudent = true;
+          this.header = 'Add new student';
+        }
+        else{
+          this.isNewStudent = false;
+          this.header = "Edit student";
+
+          this.studentService.getStudent(this.studentId).subscribe((response) =>{
+            this.student = response
+            console.log(response);
+          }, (error) =>{
+            console.log(error);
+          })
+        }
 
         this.gendersService.getGendersList().subscribe((response)=>{
           console.log(response);
@@ -88,11 +101,28 @@ export class ViewStudentComponent implements OnInit {
 
       setTimeout(() => {
         this.router.navigateByUrl('/students');
-      }, 2000);
+      }, 1000);
     }, (error) => {
       console.log(error);
       this.snackBar.open("Something went wrong when deleting the student");
     });
+  }
+
+  onAdd(){
+    this.studentService.addStudent(this.student).subscribe((response) =>{
+      console.log(response);
+      setTimeout(() => {
+        this.router.navigateByUrl('/students');
+      }, 1500);
+      this.snackBar.open("New student was added", undefined, {
+        duration: 2000
+      })
+    }, (error) => {
+      console.log(error);
+      this.snackBar.open("An error occured while adding a new student", undefined, {
+        duration: 2000
+      })
+    })
   }
 
 }

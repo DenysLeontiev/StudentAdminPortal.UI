@@ -1,3 +1,5 @@
+import { AddStudentRequest } from './../models/api-models/add-student-request.model';
+// import { Student } from './../models/ui-models/student.model';
 import { UpdateStudentRequest } from './../models/api-models/update-student-request.model';
 // import { Student } from 'src/app/models/ui-models/student.model';
 import { Student } from './../models/api-models/student.model';
@@ -42,5 +44,21 @@ export class StudentService {
   deleteStudent(studentId: string)
   {
     return this.httpClient.delete(this.baseApiUrl + '/students/' + studentId);
+  }
+
+  addStudent(studentRequest: Student){
+    const addStudent: AddStudentRequest =
+      {
+        firstName : studentRequest.firstName,
+        lastName : studentRequest.lastName,
+        dateOjBirth : studentRequest.dateOjBirth,
+        email : studentRequest.email,
+        mobile : studentRequest.mobile,
+        genderId : studentRequest.genderId,
+        postalAddress : studentRequest.address.postalAddress,
+        physicalAddress : studentRequest.address.physicalAddress
+      }
+
+      return this.httpClient.post(this.baseApiUrl + '/students/add', addStudent);
   }
 }
