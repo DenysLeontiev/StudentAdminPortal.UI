@@ -39,6 +39,8 @@ export class ViewStudentComponent implements OnInit {
   isNewStudent = false;
   header = '';
 
+  displayProfileImageUrl: string = '';
+
   constructor(private studentService:StudentService,
               private gendersService: GendersService,
               private route: ActivatedRoute,
@@ -53,15 +55,18 @@ export class ViewStudentComponent implements OnInit {
         if(this.studentId.toLowerCase() === 'Add'.toLowerCase()){
           this.isNewStudent = true;
           this.header = 'Add new student';
+          this.setImage();
         }
         else{
           this.isNewStudent = false;
           this.header = "Edit student";
 
           this.studentService.getStudent(this.studentId).subscribe((response) =>{
-            this.student = response
+            this.student = response;
+            this.setImage();
             console.log(response);
           }, (error) =>{
+            this.setImage();
             console.log(error);
           })
         }
@@ -123,6 +128,31 @@ export class ViewStudentComponent implements OnInit {
         duration: 2000
       })
     })
+  }
+
+  uploadImage(event:any): void{
+    if(this.studentId){
+      const file: File = event.target.files[0];
+      this.studentService.uploadImage(this.studentId, file).subscribe((response) =>{
+        this.displayProfileImageUrl = response;
+        this.setImage();
+        console.log(response);
+      },(error) =>{
+        console.log(error);
+        this.snackBar.open("An error occured while uploading the photo", undefined, {
+          duration: 2000
+        })
+      })
+    }
+  }
+
+  private setImage(){
+    if(this.student.profileImageUrl){
+      this.displayProfileImageUrl = this.studentService.getImagePath(this.student.profileImageUrl);
+    }
+    else{
+      this.displayProfileImageUrl  = '/assets/owl.png';
+    }
   }
 
 }

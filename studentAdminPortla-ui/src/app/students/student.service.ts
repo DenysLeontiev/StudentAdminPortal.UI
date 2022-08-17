@@ -61,4 +61,19 @@ export class StudentService {
 
       return this.httpClient.post(this.baseApiUrl + '/students/add', addStudent);
   }
+
+  uploadImage(studentId: string, file: File){
+    console.log("=======================")
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return this.httpClient.post(this.baseApiUrl + '/students/' + studentId + '/upload-image', formData, {
+      responseType: 'text'
+    });
+  }
+
+  getImagePath(relativePath: string){
+    return `${this.baseApiUrl}/${relativePath}`;
+  }
 }
