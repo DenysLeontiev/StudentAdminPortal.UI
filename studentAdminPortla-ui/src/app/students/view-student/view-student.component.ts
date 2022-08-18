@@ -1,10 +1,11 @@
 import { GendersService } from './../../services/genders.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterModule, Routes } from '@angular/router';
 import { Student } from 'src/app/models/ui-models/student.model';
 import { StudentService } from '../student.service';
 import { Gender } from 'src/app/models/ui-models/gender.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-view-student',
@@ -40,6 +41,8 @@ export class ViewStudentComponent implements OnInit {
   header = '';
 
   displayProfileImageUrl: string = '';
+
+  @ViewChild('studentDetailFrom') studentDetailFrom?: NgForm;
 
   constructor(private studentService:StudentService,
               private gendersService: GendersService,
@@ -83,17 +86,19 @@ export class ViewStudentComponent implements OnInit {
 
   onUpdate()
   {
-    this.studentService.updateStudent(this.student.id, this.student).subscribe((response) =>{
-      // show notification
-      this.snackBar.open("The student is updated successfully!", undefined, {
-        duration: 2000
+    if(this.studentDetailFrom?.form.valid){
+      this.studentService.updateStudent(this.student.id, this.student).subscribe((response) =>{
+        // show notification
+        this.snackBar.open("The student is updated successfully!", undefined, {
+          duration: 2000
+        });
+        console.log(response);
+      }, (error) =>{
+        this.snackBar.open("Something went wrong when updating the student");
+        //Log error
+        console.log(error);
       });
-      console.log(response);
-    }, (error) =>{
-      this.snackBar.open("Something went wrong when updating the student");
-      //Log error
-      console.log(error);
-    });
+    }
   }
 
   onDelete()
@@ -114,20 +119,24 @@ export class ViewStudentComponent implements OnInit {
   }
 
   onAdd(){
-    this.studentService.addStudent(this.student).subscribe((response) =>{
-      console.log(response);
-      setTimeout(() => {
-        this.router.navigateByUrl('/students');
-      }, 1500);
-      this.snackBar.open("New student was added", undefined, {
-        duration: 2000
+    if(this.studentDetailFrom?.form.valid){
+      this.studentService.addStudent(this.student).subscribe((response) =>{
+        console.log(response);
+        setTimeout(() => {
+          this.router.navigateByUrl('/students');
+        }, 1500);
+        this.snackBar.open("New student was added", undefined, {
+          duration: 2000
+        })
+      }, (error) => {
+        console.log(error);
+        this.snackBar.open("An error occured while adding a new student", undefined, {
+          duration: 2000
+        })
       })
-    }, (error) => {
-      console.log(error);
-      this.snackBar.open("An error occured while adding a new student", undefined, {
-        duration: 2000
-      })
-    })
+    }
+
+
   }
 
   uploadImage(event:any): void{
